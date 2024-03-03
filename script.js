@@ -20,10 +20,10 @@ function GameBoard() {
 
   const getBoard = () => board;
 
-  const placeToken = (row, column, player) => {
+  const placeToken = (row, column, playerToken) => {
     if (board[row][column].getValue() !== "") return;
 
-    board[row][column].addToken(player);
+    board[row][column].addToken(playerToken);
   };
 
   const printBoard = () => {
@@ -42,8 +42,8 @@ getValue() will return the cell's value
 function Cell() {
   let value = "";
 
-  const addToken = (player) => {
-    value = player;
+  const addToken = (playerToken) => {
+    value = playerToken;
   };
 
   const getValue = () => value;
@@ -59,28 +59,79 @@ when the game ends.
 function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") {
   const board = GameBoard();
 
+  // Initialise players and corresponding tokens
   const players = [
     { name: playerOneName, token: "X" },
     { name: playerTwoName, token: "O" },
   ];
 
+  // Initialise player to go first
   let activePlayer = players[0];
 
+  // Switch player using ternary condition operator
   const switchPlayerTurn = () => {
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
   };
+
+  // Return the current active player
   const getActivePlayer = () => activePlayer;
 
+  // Print a new round
   const printNewRound = () => {
     board.printBoard();
     console.log(`${getActivePlayer().name}'s turn.`);
   };
 
-  const playRound = (column) => {
-    console.log(`Dropping ${getActivePlayer().name}'s token into column ${column}...`);
+  // Check for winning conditions
+  const checkWinner = () => {
+    const currentBoard = board.getBoard();
+    for (let i = 0; i < 3; i++) {
+      // Check rows
+      if (
+        currentBoard[i][0].getValue() === getActivePlayer().token &&
+        currentBoard[i][1].getValue() === getActivePlayer().token &&
+        currentBoard[i][2].getValue() === getActivePlayer().token
+      ) {
+        return true; // Horizontal win
+      }
+      // Check columns
+      if (
+        currentBoard[0][i].getValue() === getActivePlayer().token &&
+        currentBoard[1][i].getValue() === getActivePlayer().token &&
+        currentBoard[2][i].getValue() === getActivePlayer().token
+      ) {
+        return true; // Vertical win
+      }
+    }
 
-    // Check for winner
+    // Check diagonals
+    if (
+      currentBoard[0][0].getValue() === getActivePlayer().token &&
+      currentBoard[1][1].getValue() === getActivePlayer().token &&
+      currentBoard[2][2].getValue() === getActivePlayer().token
+    ) {
+      return true; // Diagonal top-left to bottom-right
+    }
+    if (
+      currentBoard[0][2].getValue() === getActivePlayer().token &&
+      currentBoard[1][1].getValue() === getActivePlayer().token &&
+      currentBoard[2][0].getValue() === getActivePlayer().token
+    ) {
+      return true; // Diagonal top-right to bottom-left
+    }
 
+    return false; // No winning condition met
+  };
+
+  // Play round function to play in the console
+  const playRound = (row, column) => {
+    console.log(`Dropping ${getActivePlayer().token}'s token into row ${row}, column ${column}...`);
+    board.placeToken(row, column, getActivePlayer().token);
+
+    if (checkWinner()) {
+      console.log(`Game Over! ${getActivePlayer().name} Wins!`);
+      return;
+    }
     switchPlayerTurn();
     printNewRound();
   };
@@ -94,5 +145,4 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
   };
 }
 
-let x = GameBoard();
-x.printBoard();
+const game = GameController();
