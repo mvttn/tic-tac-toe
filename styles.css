@@ -1,0 +1,102 @@
+@import url("https://fonts.googleapis.com/css2?family=Madimi+One&display=swap");
+/* prettier-ignore */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	vertical-align: baseline;
+}
+
+:root {
+  --border: 1px solid #061223;
+  --font-color: #061223;
+  --box-shadow: 0px 2px 5px 2px rgb(137, 137, 137);
+}
+
+.container {
+  display: grid;
+  height: 100vh;
+  grid-template-rows: 1fr 5rem 3fr 1fr;
+  background-image: linear-gradient(0deg, #faafc7, #c2ddca);
+}
+
+.container > h1 {
+  color: var(--font-color);
+  font-size: 5rem;
+  font-family: "Madimi One", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  justify-self: center;
+  align-self: center;
+}
+
+#state-text {
+  color: var(--font-color);
+  font-size: 2rem;
+  font-family: "Madimi One", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  white-space: pre-wrap;
+}
+
+#player-one {
+  color: #f46197;
+}
+
+#player-two {
+  color: #2ca58d;
+}
+
+#board {
+  justify-self: center;
+  align-self: center;
+  display: grid;
+  grid-template-columns: repeat(3, 10rem);
+  grid-template-rows: repeat(3, 10rem);
+  box-shadow: var(--box-shadow);
+  border-radius: 1rem;
+}
+
+.cell {
+  background-color: #fffdf7;
+}
+
+.cell:hover {
+  opacity: 0.8;
+  transition: 0.3s;
+}
+
+.cell:not(:nth-child(3n)) {
+  border-right: var(--border);
+}
+
+.cell:not(:nth-last-child(-n + 3)) {
+  border-bottom: var(--border);
+}
+
+.cell:first-child {
+  border-radius: 1rem 0 0 0;
+}
+
+.cell:nth-child(3) {
+  border-radius: 0 1rem 0 0;
+}
+
+.cell:nth-child(7) {
+  border-radius: 0 0 0 1rem;
+}
+
+.cell:last-child {
+  border-radius: 0 0 1rem 0;
+}
