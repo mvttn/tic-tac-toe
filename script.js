@@ -123,11 +123,28 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
     return false; // No winning condition met
   };
 
+  // Check for draw
+  const checkDraw = () => {
+    const currentBoard = game.getBoard();
+    for (let row of currentBoard) {
+      for (let cell of row) {
+        if (cell === "") {
+          return false; // There is an empty cell, game is not a draw
+        }
+      }
+    }
+    return true; // All cells are filled, game is a draw
+  };
+
   // Play round function to play in the console
   const playRound = (row, column) => {
     console.log(`Dropping ${getActivePlayer().token}'s token into row ${row}, column ${column}...`);
     board.placeToken(row, column, getActivePlayer().token);
 
+    if (!checkDraw()) {
+      console.log(`Game Over! It's a Draw!`);
+      return;
+    }
     if (checkWinner()) {
       console.log(`Game Over! ${getActivePlayer().name} Wins!`);
       return;
@@ -146,8 +163,10 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
 }
 
 /*
- 
+ScreenController object to control what the player/s see.
 */
-function ScreenController() {
-  const game = GameController();
-}
+function ScreenController() {}
+
+// ScreenController();
+
+const game = GameController();
