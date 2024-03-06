@@ -59,7 +59,7 @@ GameController object to keep track of the game.
 Handles switching players, playing rounds and determining
 when the game ends.
 */
-function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") {
+function GameController(playerOneName, playerTwoName) {
   const board = GameBoard();
   let gameState = "active";
 
@@ -191,7 +191,17 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
 ScreenController object to control what the player/s see.
 */
 function ScreenController() {
-  const game = GameController();
+  // Promp player names
+  let playerOneName = prompt("Player 1 what is your name? ");
+  let playerTwoName = prompt("Player 2 what is your name? ");
+  // Set default names if no input is provided
+  if (!playerOneName || playerOneName.trim() === "") {
+    playerOneName = "Player 1";
+  }
+  if (!playerTwoName || playerTwoName.trim() === "") {
+    playerTwoName = "Player 2";
+  }
+  const game = GameController(playerOneName, playerTwoName);
   const stateText = document.querySelector(".state-text");
   const boardDiv = document.querySelector("#board");
   stateText.textContent = "Turn...";
