@@ -11,6 +11,7 @@ function GameBoard() {
   const board = [];
 
   // Initialise each array element as a Cell() object
+
   for (let i = 0; i < rows; i++) {
     board[i] = [];
     for (let j = 0; j < cols; j++) {
@@ -44,9 +45,13 @@ function Cell() {
     value = playerToken;
   };
 
+  const resetValue = () => {
+    value = "";
+  };
+
   const getValue = () => value;
 
-  return { addToken, getValue };
+  return { addToken, resetValue, getValue };
 }
 
 /*
@@ -67,6 +72,14 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
   // Initialise player to go first
   let activePlayer = players[0];
 
+  const resetBoard = () => {
+    for (let row of board.getBoard()) {
+      for (let cell of row) {
+        cell.resetValue();
+      }
+    }
+  };
+
   // Switch player using ternary condition operator
   const switchPlayerTurn = () => {
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
@@ -78,7 +91,7 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
   const getGameState = () => gameState;
 
   const toggleGameState = (state) => {
-    console.log("Changing states");
+    console.log(`Changing states to ${state}`);
     gameState = state;
   };
 
@@ -165,6 +178,7 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
   printNewRound();
 
   return {
+    resetBoard,
     playRound,
     getActivePlayer,
     getBoard: board.getBoard,
@@ -181,7 +195,7 @@ function ScreenController() {
   const stateText = document.querySelector(".state-text");
   const boardDiv = document.querySelector("#board");
   stateText.textContent = "Turn...";
-  function UpdateScreen() {
+  const updateScreen = () => {
     // Clear the board
     boardDiv.textContent = "";
 
@@ -210,26 +224,28 @@ function ScreenController() {
     });
 
     checkGameState();
-  }
+  };
 
   // Add event listener for the board
-  function clickHandlerBoard(e) {
+  const clickHandlerBoard = (e) => {
     const selectedCell = e.target;
     // Retrieving the row and column indexes from cell id
     const [rowIndex, colIndex] = selectedCell.id.slice(-2).split("");
     console.log(rowIndex, colIndex);
     game.playRound(+rowIndex, +colIndex);
-    UpdateScreen();
-  }
+    updateScreen();
+  };
   boardDiv.addEventListener("click", clickHandlerBoard);
 
-  function checkGameState() {
+  const checkGameState = () => {
     if (game.getGameState() !== "active") {
       // Disable all cells to prevent further moves
       const cells = document.querySelectorAll(".cell");
       cells.forEach((cell) => {
         cell.disabled = true;
       });
+      // Show "Play Again" Overlay
+      overlay.style.display = "block";
     }
     if (game.getGameState() === "Winner") {
       // prettier-ignore
@@ -251,10 +267,10 @@ function ScreenController() {
     if (game.getGameState() === "Draw") {
       stateText.textContent = `Game Over!  It's a Draw!`;
     }
-  }
+  };
 
   // Get the winning cells to apply styling
-  function getWinningCells() {
+  const getWinningCells = () => {
     const currentBoard = game.getBoard();
     const winningPlayerToken = game.getActivePlayer().token;
 
@@ -310,10 +326,34 @@ function ScreenController() {
     }
 
     return winningCells;
+  };
+
+  // Restart game function
+  function restartGame() {
+    // Reset game state
+    game.toggleGameState("active");
+    // Clear the board
+    game.resetBoard();
+    boardDiv.innerHTML = "";
+    // Hide the overlay
+    overlay.style.display = "none";
+    // Update the screen
+    updateScreen();
   }
 
+  const restartButton = document.querySelector("#restart-btn");
+  restartButton.addEventListener("click", restartGame);
+
+  const playAgain = () => {
+    // Hidden
+    overlay.style.display = "none";
+    restartGame();
+  };
+
+  const playAgainButton = document.querySelector("#play-again-btn");
+  playAgainButton.addEventListener("click", playAgain);
   // Initial render
-  UpdateScreen();
+  updateScreen();
 }
 
 ScreenController();

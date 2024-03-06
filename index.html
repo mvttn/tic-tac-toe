@@ -10,8 +10,18 @@
   <body>
     <div class="container">
       <h1>Tic Tac Toe</h1>
-      <p class="state-text"></p>
+      <div class="below-header">
+        <p class="state-text"></p>
+        <button id="restart-btn">Restart</button>
+      </div>
       <div id="board"></div>
+      <div id="overlay" class="overlay">
+        <div class="overlay-content">
+          <h2>Game Over!</h2>
+          <p>Do you want to play again?</p>
+          <button id="play-again-btn">Play Again</button>
+        </div>
+      </div>
     </div>
   </body>
 </html>
