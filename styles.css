@@ -143,26 +143,44 @@ time, mark, audio, video {
 }
 
 .overlay-content {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: white;
+  background-color: #fffdf7;
   padding: 20px;
   text-align: center;
   border-radius: 8px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 }
-
-.overlay h2 {
-  margin-bottom: 10px;
+.overlay-content > * {
+  margin: 5px;
+  font-family: var(--font-family);
 }
 
-.overlay button {
-  margin-top: 10px;
+.overlay-content > h2 {
+  color: rgb(230, 31, 31);
 }
 
-.below-header {
+.inner-container {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  margin: 20px;
+}
+
+#restart-btn {
+  max-width: 100px;
+  align-self: center;
+}
+
+#restart-btn,
+#play-again-btn {
+  display: flex;
+  justify-content: center;
+  padding: 10px 20px 10px 20px;
+  border-radius: 10px;
+  border: none;
 }
