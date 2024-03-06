@@ -56,6 +56,7 @@ when the game ends.
 */
 function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") {
   const board = GameBoard();
+  let gameState = "active";
 
   // Initialise players and corresponding tokens
   const players = [
@@ -73,6 +74,13 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
 
   // Return the current active player
   const getActivePlayer = () => activePlayer;
+
+  const getGameState = () => gameState;
+
+  const toggleGameState = (state) => {
+    console.log("Changing states");
+    gameState = state;
+  };
 
   // Print a new round
   const printNewRound = () => {
@@ -133,29 +141,23 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
     return true; // All cells are filled, game is a draw
   };
 
-  // Check if it's a valid move
-  const validateMove = (row, column) => {
-    return board.getBoard()[row][column].getValue() === "";
-  };
-
   // Play round function to play in the console
   const playRound = (row, column) => {
-    // Validate the move before progressing further
-    if (!validateMove(row, column)) {
-      console.log(`Invalid Move! Cell taken!`);
-      return;
-    }
     console.log(`Placing ${getActivePlayer().token}'s token into row ${row}, column ${column}...`);
     board.placeToken(row, column, getActivePlayer().token);
 
-    if (checkDraw()) {
-      console.log(`Game Over! It's a Draw!`);
-      return;
-    }
     if (checkWinner()) {
       console.log(`Game Over! ${getActivePlayer().name} Wins!`);
+      toggleGameState("Winner");
       return;
     }
+
+    if (checkDraw()) {
+      console.log(`Game Over! It's a Draw!`);
+      toggleGameState("Draw");
+      return;
+    }
+
     switchPlayerTurn();
     printNewRound();
   };
@@ -166,6 +168,8 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
     playRound,
     getActivePlayer,
     getBoard: board.getBoard,
+    getGameState,
+    toggleGameState,
   };
 }
 
@@ -174,12 +178,13 @@ ScreenController object to control what the player/s see.
 */
 function ScreenController() {
   const game = GameController();
-  const stateText = document.querySelector("#state-text");
+  const stateText = document.querySelector(".state-text");
   const boardDiv = document.querySelector("#board");
   stateText.textContent = "Turn...";
   function UpdateScreen() {
     // Clear the board
     boardDiv.textContent = "";
+
     // Get most recent version of the board and active player
     const board = game.getBoard();
     const activePlayer = game.getActivePlayer();
@@ -189,24 +194,22 @@ function ScreenController() {
     const playerNameText = stateText.querySelector("#player-name");
 
     // Change the color of text depending on the active player
-    if (activePlayer.token === "X") {
-      playerNameText.classList.remove("player-two");
-      playerNameText.classList.add("player-one");
-    } else if (activePlayer.token === "O") {
-      playerNameText.classList.remove("player-one");
-      playerNameText.classList.add("player-two");
-    }
+    playerNameText.classList.remove("player-one", "player-two");
+    playerNameText.classList.add(activePlayer.token === "X" ? "player-one" : "player-two");
 
-    // Render board
+    // Render state of the board
     board.forEach((row, rowIndex) => {
       row.forEach((cell, colIndex) => {
         const cellButton = document.createElement("button");
         cellButton.classList.add("cell");
-        cellButton.id = "Cell-" + rowIndex + colIndex;
+        cellButton.id = `Cell-${rowIndex}${colIndex}`;
         cellButton.textContent = cell.getValue();
+        cellButton.disabled = cell.getValue() !== ""; // Disable filled cells
         boardDiv.appendChild(cellButton);
       });
     });
+
+    checkGameState();
   }
 
   // Add event listener for the board
@@ -219,6 +222,32 @@ function ScreenController() {
     UpdateScreen();
   }
   boardDiv.addEventListener("click", clickHandlerBoard);
+
+  function checkGameState() {
+    if (game.getGameState() !== "active") {
+      // Disable all cells to prevent further moves
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach((cell) => {
+        cell.disabled = true;
+      });
+    }
+    if (game.getGameState() === "Winner") {
+      // prettier-ignore
+      {      
+      stateText.innerHTML = `Game Over!  <span id="player-name">${game.getActivePlayer().name}</span>  Wins!`;
+      stateText.classList.add("winner");
+      const playerNameText = stateText.querySelector("#player-name");
+      // Change the color of text depending on the active player
+      playerNameText.classList.remove("player-one", "player-two");
+      playerNameText.classList.add(
+        game.getActivePlayer().token === "X" ? "player-one" : "player-two"
+      );
+      }
+    }
+    if (game.getGameState() === "Draw") {
+      stateText.textContent = `Game Over!  It's a Draw!`;
+    }
+  }
 
   // Initial render
   UpdateScreen();
