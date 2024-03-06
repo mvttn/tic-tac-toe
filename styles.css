@@ -114,3 +114,19 @@ time, mark, audio, video {
   color: rgb(255, 217, 0);
   text-shadow: var(--text-shadow);
 }
+@keyframes strikeThrough {
+  0% {
+    text-decoration: none;
+  }
+  50% {
+    text-decoration: line-through;
+    text-decoration-color: red;
+  }
+  100% {
+    text-decoration: none;
+  }
+}
+
+.winner-cell {
+  animation: strikeThrough 1s infinite;
+}

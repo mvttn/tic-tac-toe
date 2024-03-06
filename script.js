@@ -234,6 +234,10 @@ function ScreenController() {
     if (game.getGameState() === "Winner") {
       // prettier-ignore
       {      
+      const winningCells = getWinningCells(); // Get the winning cells
+      winningCells.forEach((cell) => {
+        cell.classList.add("winner-cell"); // Apply strike-through effect
+      });
       stateText.innerHTML = `Game Over!  <span id="player-name">${game.getActivePlayer().name}</span>  Wins!`;
       stateText.classList.add("winner");
       const playerNameText = stateText.querySelector("#player-name");
@@ -247,6 +251,65 @@ function ScreenController() {
     if (game.getGameState() === "Draw") {
       stateText.textContent = `Game Over!  It's a Draw!`;
     }
+  }
+
+  // Get the winning cells to apply styling
+  function getWinningCells() {
+    const currentBoard = game.getBoard();
+    const winningPlayerToken = game.getActivePlayer().token;
+
+    const winningCells = [];
+
+    // Check rows
+    for (let i = 0; i < 3; i++) {
+      if (
+        currentBoard[i][0].getValue() === winningPlayerToken &&
+        currentBoard[i][1].getValue() === winningPlayerToken &&
+        currentBoard[i][2].getValue() === winningPlayerToken
+      ) {
+        winningCells.push(document.getElementById(`Cell-${i}0`));
+        winningCells.push(document.getElementById(`Cell-${i}1`));
+        winningCells.push(document.getElementById(`Cell-${i}2`));
+        break;
+      }
+    }
+
+    // Check columns
+    for (let i = 0; i < 3; i++) {
+      if (
+        currentBoard[0][i].getValue() === winningPlayerToken &&
+        currentBoard[1][i].getValue() === winningPlayerToken &&
+        currentBoard[2][i].getValue() === winningPlayerToken
+      ) {
+        winningCells.push(document.getElementById(`Cell-0${i}`));
+        winningCells.push(document.getElementById(`Cell-1${i}`));
+        winningCells.push(document.getElementById(`Cell-2${i}`));
+        break;
+      }
+    }
+
+    // Check diagonals
+    if (
+      currentBoard[0][0].getValue() === winningPlayerToken &&
+      currentBoard[1][1].getValue() === winningPlayerToken &&
+      currentBoard[2][2].getValue() === winningPlayerToken
+    ) {
+      winningCells.push(document.getElementById(`Cell-00`));
+      winningCells.push(document.getElementById(`Cell-11`));
+      winningCells.push(document.getElementById(`Cell-22`));
+    }
+
+    if (
+      currentBoard[0][2].getValue() === winningPlayerToken &&
+      currentBoard[1][1].getValue() === winningPlayerToken &&
+      currentBoard[2][0].getValue() === winningPlayerToken
+    ) {
+      winningCells.push(document.getElementById(`Cell-02`));
+      winningCells.push(document.getElementById(`Cell-11`));
+      winningCells.push(document.getElementById(`Cell-20`));
+    }
+
+    return winningCells;
   }
 
   // Initial render
