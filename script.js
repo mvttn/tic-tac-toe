@@ -21,8 +21,6 @@ function GameBoard() {
   const getBoard = () => board;
 
   const placeToken = (row, column, playerToken) => {
-    if (board[row][column].getValue() !== "") return;
-
     board[row][column].addToken(playerToken);
   };
 
@@ -125,10 +123,9 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
 
   // Check for draw
   const checkDraw = () => {
-    const currentBoard = game.getBoard();
-    for (let row of currentBoard) {
+    for (let row of board.getBoard()) {
       for (let cell of row) {
-        if (cell === "") {
+        if (cell.getValue() === "") {
           return false; // There is an empty cell, game is not a draw
         }
       }
@@ -136,12 +133,22 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
     return true; // All cells are filled, game is a draw
   };
 
+  // Check if it's a valid move
+  const validateMove = (row, column) => {
+    return board.getBoard()[row][column].getValue() === "";
+  };
+
   // Play round function to play in the console
   const playRound = (row, column) => {
-    console.log(`Dropping ${getActivePlayer().token}'s token into row ${row}, column ${column}...`);
+    // Validate the move before progressing further
+    if (!validateMove(row, column)) {
+      console.log(`Invalid Move! Cell taken!`);
+      return;
+    }
+    console.log(`Placing ${getActivePlayer().token}'s token into row ${row}, column ${column}...`);
     board.placeToken(row, column, getActivePlayer().token);
 
-    if (!checkDraw()) {
+    if (checkDraw()) {
       console.log(`Game Over! It's a Draw!`);
       return;
     }
@@ -165,8 +172,56 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
 /*
 ScreenController object to control what the player/s see.
 */
-function ScreenController() {}
+function ScreenController() {
+  const game = GameController();
+  const stateText = document.querySelector("#state-text");
+  const boardDiv = document.querySelector("#board");
+  stateText.textContent = "Turn...";
+  function UpdateScreen() {
+    // Clear the board
+    boardDiv.textContent = "";
+    // Get most recent version of the board and active player
+    const board = game.getBoard();
+    const activePlayer = game.getActivePlayer();
 
-// ScreenController();
+    // Display the active player's turn
+    stateText.innerHTML = `<span id="player-name">${activePlayer.name}'s </span> Turn...`;
+    const playerNameText = stateText.querySelector("#player-name");
 
-const game = GameController();
+    // Change the color of text depending on the active player
+    if (activePlayer.token === "X") {
+      playerNameText.classList.remove("player-two");
+      playerNameText.classList.add("player-one");
+    } else if (activePlayer.token === "O") {
+      playerNameText.classList.remove("player-one");
+      playerNameText.classList.add("player-two");
+    }
+
+    // Render board
+    board.forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
+        const cellButton = document.createElement("button");
+        cellButton.classList.add("cell");
+        cellButton.id = "Cell-" + rowIndex + colIndex;
+        cellButton.textContent = cell.getValue();
+        boardDiv.appendChild(cellButton);
+      });
+    });
+  }
+
+  // Add event listener for the board
+  function clickHandlerBoard(e) {
+    const selectedCell = e.target;
+    // Retrieving the row and column indexes from cell id
+    const [rowIndex, colIndex] = selectedCell.id.slice(-2).split("");
+    console.log(rowIndex, colIndex);
+    game.playRound(+rowIndex, +colIndex);
+    UpdateScreen();
+  }
+  boardDiv.addEventListener("click", clickHandlerBoard);
+
+  // Initial render
+  UpdateScreen();
+}
+
+ScreenController();

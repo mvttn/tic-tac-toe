@@ -50,11 +50,11 @@ time, mark, audio, video {
   white-space: pre-wrap;
 }
 
-#player-one {
+.player-one {
   color: #f46197;
 }
 
-#player-two {
+.player-two {
   color: #2ca58d;
 }
 
@@ -70,11 +70,13 @@ time, mark, audio, video {
 
 .cell {
   background-color: #fffdf7;
+  border: none;
 }
 
 .cell:hover {
+  scale: 1.01;
   opacity: 0.8;
-  transition: 0.3s;
+  transition: 0.2s;
 }
 
 .cell:not(:nth-child(3n)) {
