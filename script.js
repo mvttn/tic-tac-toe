@@ -280,8 +280,8 @@ function ScreenController() {
           break;
         }
       }
-      updateScreen();
     }
+    updateScreen();
   };
 
   boardDiv.addEventListener("click", clickHandlerBoard);
