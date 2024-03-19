@@ -61,6 +61,7 @@ when the game ends.
 */
 function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") {
   const board = GameBoard();
+  let gameMode = "unselected";
   let gameState = "active";
 
   // Initialise players and corresponding tokens
@@ -87,6 +88,15 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
 
   // Return the current active player
   const getActivePlayer = () => activePlayer;
+
+  const resetPlayer = () => (activePlayer = players[0]);
+
+  const getGameMode = () => gameMode;
+
+  const setGameMode = (mode) => {
+    console.log(`Changing game mode to ${mode}`);
+    gameMode = mode;
+  };
 
   const getGameState = () => gameState;
 
@@ -157,6 +167,7 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
   // Play round function to play in the console
   const playRound = (row, column) => {
     console.log(`Placing ${getActivePlayer().token}'s token into row ${row}, column ${column}...`);
+
     board.placeToken(row, column, getActivePlayer().token);
 
     if (checkWinner()) {
@@ -181,8 +192,11 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
     resetBoard,
     playRound,
     getActivePlayer,
+    resetPlayer,
     getBoard: board.getBoard,
+    getGameMode,
     getGameState,
+    setGameMode,
     toggleGameState,
   };
 }
@@ -192,20 +206,29 @@ ScreenController object to control what the player/s see.
 */
 function ScreenController() {
   const gameEndOverlay = document.querySelector("#overlay");
+  const initialOverlay = document.querySelector("#initial-screen");
   const initialScreen = () => {
-    const initialOverlay = document.querySelector("#initial-screen");
     initialOverlay.style.display = "block";
+    chooseGameMode();
   };
-  // Promp player names
-  // let playerOneName = prompt("Player 1 what is your name? ");
-  // let playerTwoName = prompt("Player 2 what is your name? ");
-  // Set default names if no input is provided
-  // if (!playerOneName || playerOneName.trim() === "") {
-  //   let playerOneName = "Player 1";
-  // }
-  // if (!playerTwoName || playerTwoName.trim() === "") {
-  //   let playerTwoName = "Player 2";
-  // }
+
+  const chooseGameMode = () => {
+    const pvpBtn = initialOverlay.querySelector("#pvp");
+    const cpuBtn = initialOverlay.querySelector("#cpu");
+
+    // Update the game mode from "unselected"
+    pvpBtn.addEventListener("click", () => {
+      game.setGameMode("pvp");
+      initialOverlay.style.display = "none";
+    });
+    cpuBtn.addEventListener("click", () => {
+      game.setGameMode("cpu");
+      initialOverlay.style.display = "none";
+    });
+  };
+
+  // Initial render
+  initialScreen();
   const game = GameController();
   const stateText = document.querySelector(".state-text");
   const boardDiv = document.querySelector("#board");
@@ -237,7 +260,6 @@ function ScreenController() {
         boardDiv.appendChild(cellButton);
       });
     });
-
     checkGameState();
   };
 
@@ -248,8 +270,20 @@ function ScreenController() {
     const [rowIndex, colIndex] = selectedCell.id.slice(-2).split("");
     console.log(rowIndex, colIndex);
     game.playRound(+rowIndex, +colIndex);
-    updateScreen();
+    if (game.getGameMode() === "cpu") {
+      // Place a random position for cpu
+      while (game.getGameState() === "active") {
+        let row = Math.floor(Math.random() * 3);
+        let col = Math.floor(Math.random() * 3);
+        if (game.getBoard()[row][col].getValue() === "") {
+          game.playRound(row, col);
+          break;
+        }
+      }
+      updateScreen();
+    }
   };
+
   boardDiv.addEventListener("click", clickHandlerBoard);
 
   const checkGameState = () => {
@@ -352,6 +386,8 @@ function ScreenController() {
     boardDiv.innerHTML = "";
     // Hide the gameEndOverlay
     gameEndOverlay.style.display = "none";
+    // Reset player
+    game.resetPlayer();
     // Update the screen
     updateScreen();
   }
@@ -367,9 +403,7 @@ function ScreenController() {
 
   const playAgainButton = document.querySelector("#play-again-btn");
   playAgainButton.addEventListener("click", playAgain);
-  // Initial render
-  // updateScreen();
-  initialScreen();
+  updateScreen();
 }
 
 ScreenController();
