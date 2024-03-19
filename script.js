@@ -59,7 +59,7 @@ GameController object to keep track of the game.
 Handles switching players, playing rounds and determining
 when the game ends.
 */
-function GameController(playerOneName, playerTwoName) {
+function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") {
   const board = GameBoard();
   let gameState = "active";
 
@@ -191,17 +191,22 @@ function GameController(playerOneName, playerTwoName) {
 ScreenController object to control what the player/s see.
 */
 function ScreenController() {
+  const gameEndOverlay = document.querySelector("#overlay");
+  const initialScreen = () => {
+    const initialOverlay = document.querySelector("#initial-screen");
+    initialOverlay.style.display = "block";
+  };
   // Promp player names
-  let playerOneName = prompt("Player 1 what is your name? ");
-  let playerTwoName = prompt("Player 2 what is your name? ");
+  // let playerOneName = prompt("Player 1 what is your name? ");
+  // let playerTwoName = prompt("Player 2 what is your name? ");
   // Set default names if no input is provided
-  if (!playerOneName || playerOneName.trim() === "") {
-    playerOneName = "Player 1";
-  }
-  if (!playerTwoName || playerTwoName.trim() === "") {
-    playerTwoName = "Player 2";
-  }
-  const game = GameController(playerOneName, playerTwoName);
+  // if (!playerOneName || playerOneName.trim() === "") {
+  //   let playerOneName = "Player 1";
+  // }
+  // if (!playerTwoName || playerTwoName.trim() === "") {
+  //   let playerTwoName = "Player 2";
+  // }
+  const game = GameController();
   const stateText = document.querySelector(".state-text");
   const boardDiv = document.querySelector("#board");
   stateText.textContent = "Turn...";
@@ -254,8 +259,8 @@ function ScreenController() {
       cells.forEach((cell) => {
         cell.disabled = true;
       });
-      // Show "Play Again" Overlay
-      overlay.style.display = "block";
+      // Show "Play Again" gameEndOverlay
+      gameEndOverlay.style.display = "block";
     }
     if (game.getGameState() === "Winner") {
       // prettier-ignore
@@ -345,8 +350,8 @@ function ScreenController() {
     // Clear the board
     game.resetBoard();
     boardDiv.innerHTML = "";
-    // Hide the overlay
-    overlay.style.display = "none";
+    // Hide the gameEndOverlay
+    gameEndOverlay.style.display = "none";
     // Update the screen
     updateScreen();
   }
@@ -356,14 +361,15 @@ function ScreenController() {
 
   const playAgain = () => {
     // Hidden
-    overlay.style.display = "none";
+    gameEndOverlay.style.display = "none";
     restartGame();
   };
 
   const playAgainButton = document.querySelector("#play-again-btn");
   playAgainButton.addEventListener("click", playAgain);
   // Initial render
-  updateScreen();
+  // updateScreen();
+  initialScreen();
 }
 
 ScreenController();
